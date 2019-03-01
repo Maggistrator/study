@@ -8,15 +8,12 @@ public class AbsoluteSort {
 	 */
 	public static void main(String[] args) {
 
-		float[] arr = null;
+		float[] arr = new float[15];
 		float dop;
 		// ¬вод чисел в массив
 		float absI;
 		float absJ;
 		Scanner scanner = new Scanner(System.in);
-		System.out.print("Type size of an array: ");
-		int size = scanner.nextInt();
-		arr = new float[size];
 		
 		for (int i = 0; i < arr.length; i++) {
 			// проверка на корректность ввода

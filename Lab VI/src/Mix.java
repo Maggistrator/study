@@ -9,7 +9,7 @@ public class Mix {
 	 */
 	public static void main(String[] args) {
 
-		double[] arr;
+		double[] arr = new double[15];
 		//чтобы MIN заменилось меньшим числом даЄм ему большое значение
 		double min = Double.MAX_VALUE;
 		double max = 0;
@@ -18,9 +18,6 @@ public class Mix {
 		int maxIndex = 0;
 		// ¬вод чисел в массив
 		Scanner scanner = new Scanner(System.in);
-		System.out.print("Type size of an array: ");
-		int size = scanner.nextInt();
-		arr = new double[size];
 		
 		for (int i = 0; i < arr.length; i++) {
 			// проверка на корректность ввода
@@ -48,6 +45,8 @@ public class Mix {
 			}
 		}
 
+		System.out.println("swapping "+min+" and "+max);
+		
 		// —мена местами минимальное и максимальное значение с помощью доп переменной
 		dop = arr[minIndex];
 		arr[minIndex] = arr[maxIndex];

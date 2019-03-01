@@ -16,6 +16,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -29,22 +30,58 @@ import org.xml.sax.SAXException;
  * 
  * p.s. было бы проще пушить записи в SQLite базу, но я слишком поздно сообразил
  * */
-public class PhonePrankerTool {
+public class PhoneNumberRegistry {
 	
 	static Stack<Record> stack = new Stack<Record>();
 	
 	static File registry = new File("src/data/i1/registry.xml");
 	
-	public static void main(String[] args){
+	public static void main(String[] args) throws FileNotFoundException, IOException, ClassNotFoundException{
 		Scanner scan = new Scanner(System.in);
-		boolean sessinComplete = false;
-		while(!sessinComplete) {
-			System.out.println("Вас приветствует реестр телефонных звонков.");
-			System.out.println("Чтобы ввести запись, нажмите 1. Чтобы найти запись, нажмите 2.");
-			
-			
+		System.out.println("Вас приветствует реестр телефонных звонков.");
+		System.out.println("Чтобы ввести запись, нажмите 1. Чтобы найти запись, нажмите 2. Чтобы завершить работу, нажмите 0.");
+
+		while(true) {
+			System.out.println("-----");
+			System.out.print("Выберите действие: ");
+			int ans = scan.nextInt();
+			switch (ans) {
+			case 1:
+				Record rec = Record.createInstance();
+				stack.push(rec);
+				System.out.print("Хотите сохранить эту запись? y/n: ");
+				if(scan.next().equalsIgnoreCase("y")) {
+					File file = serialiseRecord(rec);
+					System.out.print("Введите уникальный циферный номер записи, который вам будет легко вспомнить: ");
+					registerRecord(file, scan.nextInt());
+					System.out.println("запись сохранена");
+				} else System.out.println("запись не будет сохранена");
+				break;
+
+			case 2:
+				System.out.print("Получить последнюю запись стека, или попытаться найти запись по ID? (stack/id)");
+				if(scan.next().equalsIgnoreCase("stack")) {
+					if(!stack.isEmpty()) {
+						System.out.println("После чтения, запись будет удалена. Содержимое записи:");
+						System.out.println(stack.pop().toString());
+					} else System.out.println("Стек пуст.");
+				} else {
+					System.out.print("Введите номер записи: ");
+					int id = scan.nextInt();
+					rec = findRecordInArchive(id);
+					if(rec != null) System.out.println("Запись найдена, содержимое: "+rec.toString());
+					else System.out.println("Запись не найдена.");
+				}
+				break;
+			case 0:
+				System.out.println("Программа завершает работу.");
+				System.exit(0);
+				break;
+			default:
+				System.out.println("Команда не распознана.");
+				break;
+			}
 		}
-		
 	}
 
 	private static Record findRecordInArchive(int id) throws IOException, ClassNotFoundException {
@@ -86,21 +123,24 @@ public class PhonePrankerTool {
 			//генерируем document из XML
 			document = dBuilder.parse(registry);
 			
+			Node root = document.getElementsByTagName("registry").item(0);
+			
 	        Element record = document.createElement("record");
 	        record.setAttribute("id", ID+"");
 	        record.setTextContent(file.getAbsolutePath());
-	        document.appendChild(record);
+	        root.appendChild(record);
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private static void serialiseRecord(Record rec) throws FileNotFoundException, IOException {
-		File file = File.createTempFile("i1_", "stack", new File("src/data/i1/"));
+	private static File serialiseRecord(Record rec) throws FileNotFoundException, IOException {
+		File file = File.createTempFile("i1_", ".stack", new File("src/data/i1/"));
 		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file));
 		registerRecord(file, rec.ID);
 		out.writeObject(rec);
 		out.close();
+		return file;
 	}
 	
 	private static Record deserialiseRecord(File file) throws FileNotFoundException, IOException, ClassNotFoundException {

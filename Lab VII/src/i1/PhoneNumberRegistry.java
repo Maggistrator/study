@@ -13,6 +13,10 @@ import java.util.Stack;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -54,7 +58,6 @@ public class PhoneNumberRegistry {
 					File file = serialiseRecord(rec);
 					System.out.print("Введите уникальный циферный номер записи, который вам будет легко вспомнить: ");
 					registerRecord(file, scan.nextInt());
-					System.out.println("запись сохранена");
 				} else System.out.println("запись не будет сохранена");
 				break;
 
@@ -129,6 +132,14 @@ public class PhoneNumberRegistry {
 	        record.setAttribute("id", ID+"");
 	        record.setTextContent(file.getAbsolutePath());
 	        root.appendChild(record);
+	        
+	        // Сохранить текстовое представление XML документа в файл             
+	        Transformer transformer = TransformerFactory.newInstance().newTransformer();             
+	        DOMSource source = new DOMSource(document);             
+	        StreamResult result = new StreamResult(registry);                          
+	        transformer.transform(source, result);             
+	        System.out.println("Запись сохранена!");
+	        
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -137,7 +148,6 @@ public class PhoneNumberRegistry {
 	private static File serialiseRecord(Record rec) throws FileNotFoundException, IOException {
 		File file = File.createTempFile("i1_", ".stack", new File("src/data/i1/"));
 		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file));
-		registerRecord(file, rec.ID);
 		out.writeObject(rec);
 		out.close();
 		return file;

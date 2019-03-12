@@ -24,10 +24,6 @@ public class GreatTheoremFermat {
 		System.out.println("a = "+a);
 		System.out.println("b = "+b);
 		
-		//в задницу читабельность!
-		//в задницу оптимизацию!
-		//в задницу обработку исключений!
-		
 		if(n > 2 && a > 100 && b > 100) System.out.print("Решений не существует.");
 		else {
 			double pow_a = Math.pow(a, n);
@@ -39,6 +35,4 @@ public class GreatTheoremFermat {
 			else System.out.print("Решений не существует.");
 		}
 	}
-	
-	//Ферма - П*дор!
 }
